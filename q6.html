@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .q1 {
+                transform: scale(0.8);
+                transform-origin: top left;
+            }
+
+            .timer {
+                right: 10px;
+                top: 10px;
+                transform: scale(0.8);
+            }
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .popup-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            width: 400px;
+            height: 200px;
+            display: flex;
+            margin: 20% 30%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-content h2 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .popup-content p {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .close-btn {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .close-btn:hover {
+            background-color: #3e8e41;
+        }
+
+        .popup-content::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .popup-content::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            filter: blur(10px);
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 200px;
+        }
+
+        .c-score {
+            margin-right: 10px;
+        }
+
+        .progress-bar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4caf50;
+            width: 0%;
+            /* Initial width */
+            transition: width 0.3s ease-in-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <span id="score-display"></span>
+    <div
+        class="timer w-20 h-20 right-4 top-4 absolute bg-white rounded-full border-2 border-slate-500 flex justify-center items-center">
+        <div id="timer">00:00</div>
+    </div>
+    <div class="q1 w-full h-full relative bg-white"></div>
+    <div id="q1" class="check w-40 h-7 left-[172px] top-[143px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q2" class="check w-40 h-7 left-[172px] top-[175px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q3" class="check w-40 h-7 left-[172px] top-[207px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q4" class="check w-40 h-7 left-[172px] top-[240px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q5" class="check w-40 h-7 left-[172px] top-[273px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q6" class="check w-40 h-7 left-[172px] top-[306px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q7" class="check w-40 h-7 left-[172px] top-[339px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div id="q8" class="check w-40 h-7 left-[172px] top-[373px] absolute">
+        <div class="r1 w-7 h-7 left-0 top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r2 w-7 h-7 left-[31.97px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r3 w-7 h-7 left-[63.94px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r4 w-7 h-7 left-[95.91px] top-0 absolute rounded border-2 border-slate-500"></div>
+        <div class="r5 w-7 h-7 left-[128.80px] top-0 absolute rounded border-2 border-slate-500"></div>
+    </div>
+    <div class="abcde w-36 left-[177.90px] top-[110px] absolute">
+        <div class="A w-1.5 h-5 left-0 top-0 absolute text-blue-950 text-xl font-medium">A</div>
+        <div class="B w-2 h-5 left-[32.28px] top-0 absolute text-blue-950 text-xl font-medium">B</div>
+        <div class="C w-1.5 h-5 left-[64.93px] top-0 absolute text-blue-950 text-xl font-medium">C</div>
+        <div class="D w-2 h-5 left-[97.21px] top-0 absolute text-blue-950 text-xl font-medium">D</div>
+        <div class="E w-1.5 h-5 left-[130.24px] top-0 absolute text-blue-950 text-xl font-medium">E</div>
+    </div>
+    <div
+        class="t1 w-60 h-96 left-[878px] top-[109px] absolute rounded-sm flex-col justify-start items-start inline-flex">
+        <div
+            class="t w-60 grow shrink basis-0 bg-white rounded border-2 border-slate-500 flex-col justify-start items-start flex">
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">C</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">$</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">E</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ☀</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">B</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ❖</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">A</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ⌘</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">D</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            β</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">C</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ￥</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">E</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ✽</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">A</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ۞</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">B</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ❈</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row self-stretch bg-white/0 rounded-lg justify-start items-start inline-flex">
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium">D</div>
+                    </div>
+                </div>
+                <div
+                    class="cell w-28 self-stretch bg-white/5 border-l border-t border-slate-500 flex-col justify-center items-start inline-flex">
+                    <div class="content self-stretch px-3 py-2.5 justify-start items-start inline-flex">
+                        <div
+                            class="text grow shrink basis-0 text-center text-slate-500 text-sm font-medium font-['Inter']">
+                            ❂</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="123 w-36 top-[142px] absolute">
+        <div class="1 w-1.5 h-5 right-[-6px] absolute text-blue-950 text-xl font-medium">1</div>
+        <div class="2 w-1.5 h-5 right-[-5px] top-[33px] absolute text-blue-950 text-xl font-medium">2</div>
+        <div class="3 w-1.5 h-5 right-[-5px] top-[65px] absolute text-blue-950 text-xl font-medium">3</div>
+        <div class="4 w-1.5 h-5 right-[-4px] top-[98px] absolute text-blue-950 text-xl font-medium">4</div>
+        <div class="5 w-1.5 h-5 right-[-5px] top-[129px] absolute text-blue-950 text-xl font-medium">5</div>
+        <div class="6 w-1.5 h-5 right-[-5px] top-[163px] absolute text-blue-950 text-xl font-medium">6</div>
+        <div class="7 w-1.5 h-5 right-[-5px] top-[195px] absolute text-blue-950 text-xl font-medium">7</div>
+        <div class="8 w-1.5 h-5 right-[-5px] top-[230px] absolute text-blue-950 text-xl font-medium">8</div>
+    </div>
+    <div class="absolute text-center text-slate-500 text-lg font-normal"></div>
+    <div class="1 w-1.5 h-5 left-[748px] top-[138px] absolute text-blue-950 text-xl font-medium font-['Inter']">$</div>
+    <div class="2 w-1.5 h-5 left-[745px] top-[170px] absolute text-blue-950 text-xl font-medium font-['Inter']">☀</div>
+    <div class="3 w-1.5 h-5 left-[745px] top-[202px] absolute text-blue-950 text-xl font-medium font-['Inter']">❖</div>
+    <div class="4 w-1.5 h-5 left-[744px] top-[235px] absolute text-blue-950 text-xl font-medium font-['Inter']">⌘</div>
+    <div class="5 w-1.5 h-5 left-[748px] top-[268px] absolute text-blue-950 text-xl font-medium font-['Inter']">β</div>
+    <div class="6 w-1.5 h-5 left-[743px] top-[298px] absolute text-blue-950 text-xl font-medium font-['Inter']">￥</div>
+    <div class="7 w-1.5 h-5 left-[745px] top-[332px] absolute text-blue-950 text-xl font-medium font-['Inter']">✽</div>
+    <div class="8 w-1.5 h-5 left-[743px] top-[365px] absolute text-blue-950 text-xl font-medium font-['Inter']">۞</div>
+    </div>
+    <div id="timeoutPopup" class="popup">
+        <div class="popup-content">
+            <p>Time's up! Your score is saved.</p>
+            <button class="close-btn" onclick="closePopup()">Close</button>
+        </div>
+    </div>
+    <div class="bar w-full h-14 left-[76px] top-[19px] absolute">
+        <div class="arrow w-6 h-6 left-[900px] top-[9px] absolute text-teal-600 text-4xl">
+            <div class="next w-24 h-10 left-[120px] top-[498px] absolute">
+                <div class="r1 w-24 h-10 left-0 top-0 absolute bg-teal-600 rounded-full"></div>
+                <div class="g1 w-20 h-6 left-[19px] top-[8px] absolute">
+                    <div class="arrow left-[50px] top-0 absolute text-white text-base"><i class="fa fa-arrow-right"
+                            aria-hidden="true"></i></div>
+                    <div class="next left-0 top-[-1px] absolute text-white text-lg font-semibold"><a href="result.html"
+                            class="cursor pointer">NEXT</a></div>
+                </div>
+            </div>
+            <div class="prev w-36 h-10 left-[-920px] top-[498px] absolute">
+                <div class="r1 w-36 h-10 left-0 top-0 absolute bg-teal-600 rounded-full"></div>
+                <div class="prev left-[40px] top-[7px] absolute text-white text-lg font-semibold"><a href="q5.html"
+                        class="cursor pointer">PREVIOUS</a></div>
+                <div class="arrow w-6 h-6 left-[17px] top-[8px] absolute text-white text-base"><i
+                        class="fa fa-arrow-left" aria-hidden="true"></i></div>
+            </div>
+            <div class="score-container left-[-400px] top-[508px] absolute text-slate-500 text-xl font-semibold">
+                <span class="c-score"></span>
+            </div>
+            <div class="Group143 w-96 h-64 left-[-650px] top-[100px] absolute">
+                <div class="l11 w-44 h-px left-[1px] top-[31px] absolute border-2 border-black"></div>
+                <div
+                    class="l12 w-8 h-px left-[174px] top-[64px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l13 w-52 h-px left-[174px] top-[64px] absolute border-2 border-black"></div>
+                <div
+                    class="l14 w-3 h-px left-[382px] top-[55px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l15 w-5 h-px left-[382px] top-[55px] absolute border-2 border-black"></div>
+                <div class="l31 w-40 h-px left-[1px] top-[95px] absolute border-2 border-black"></div>
+                <div
+                    class="l32 w-16 h-px left-[160px] top-[159px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div
+                    class="l33 w-11 h-px left-[160px] top-[159px] absolute origin-top-left rotate-180 border-2 border-black">
+                </div>
+                <div
+                    class="l34 w-16 h-px left-[120px] top-[91px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l35 w-28 h-px left-[116px] top-[90px] absolute border-2 border-black"></div>
+                <div
+                    class="l36 w-20 h-px left-[228px] top-[170px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l37 w-16 h-px left-[228px] top-[167px] absolute border-2 border-black"></div>
+                <div
+                    class="l38 w-14 h-px left-[292px] top-[113px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l39 w-12 h-px left-[292px] top-[113px] absolute border-2 border-black"></div>
+                <div
+                    class="l310 w-36 h-px left-[340px] top-[257px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l311 w-16 h-px left-[340px] top-[257px] absolute border-2 border-black"></div>
+                <div class="l41 w-10 h-px left-[1px] top-[125px] absolute border-2 border-black"></div>
+                <div
+                    class="l42 w-6 h-px left-[42px] top-[105px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l43 w-64 h-px left-[42px] top-[105px] absolute border-2 border-black"></div>
+                <div
+                    class="l44 w-14 h-px left-[300px] top-[53px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div
+                    class="l45 w-48 h-px left-[300px] top-[53px] absolute origin-top-left -rotate-180 border-2 border-black">
+                </div>
+                <div
+                    class="l46 w-8 h-px left-[110px] top-[21px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l47 w-16 h-px left-[110px] top-[21px] absolute border-2 border-black"></div>
+                <div
+                    class="l48 w-2.5 h-px left-[178px] top-[15px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l49 w-56 h-px left-[178px] top-[15px] absolute border-2 border-black"></div>
+                <div class="l51 w-2.5 h-px left-[1px] top-[158px] absolute border-2 border-black"></div>
+                <div
+                    class="l52 w-36 h-px left-[15px] top-[18px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l53 w-14 h-px left-[15px] top-[18px] absolute border-2 border-black"></div>
+                <div
+                    class="l54 w-28 h-px left-[70px] top-[130px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l55 w-32 h-px left-[70px] top-[130px] absolute border-2 border-black"></div>
+                <div
+                    class="l56 w-24 h-px left-[200px] top-[38px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l57 w-11 h-px left-[200px] top-[38px] absolute border-2 border-black"></div>
+                <div
+                    class="l58 w-20 h-px left-[240px] top-[118px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l59 w-20 h-px left-[240px] top-[118px] absolute border-2 border-black"></div>
+                <div
+                    class="l510 w-10 h-px left-[320px] top-[120px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l511 w-20 h-px left-[316px] top-[160px] absolute border-2 border-black"></div>
+                <div class="l61 w-20 h-px left-[1px] top-[192px] absolute border-2 border-black"></div>
+                <div
+                    class="l62 w-20 h-px left-[81px] top-[116px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l63 w-24 h-px left-[80px] top-[116px] absolute border-2 border-black"></div>
+                <div
+                    class="l64 w-24 h-px left-[174px] top-[212px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l65 w-20 h-px left-[174px] top-[210px] absolute border-2 border-black"></div>
+                <div
+                    class="l66 w-44 h-px left-[258px] top-[38px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l67 w-14 h-px left-[258px] top-[38px] absolute border-2 border-black"></div>
+                <div
+                    class="l68 w-7 h-px left-[310px] top-[70px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l69 w-12 h-px left-[310px] top-[70px] absolute border-2 border-black"></div>
+                <div
+                    class="l610 w-12 h-px left-[356px] top-[118px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l611 w-11 h-px left-[356px] top-[118px] absolute border-2 border-black"></div>
+                <div class="l71 w-20 h-px left-[1px] top-[223px] absolute border-2 border-black"></div>
+                <div
+                    class="l72 w-2 h-px left-[77px] top-[231px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l73 w-72 h-px left-[77px] top-[231px] absolute border-2 border-black"></div>
+                <div
+                    class="l74 w-36 h-px left-[368px] top-[91px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l75 w-8 h-px left-[368px] top-[91px] absolute border-2 border-black"></div>
+                <div class="l81 w-28 h-px left-[1px] top-[257px] absolute border-2 border-black"></div>
+                <div
+                    class="l82 w-64 h-px left-[115px] top-[5px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l83 w-36 h-px left-[115px] top-[5px] absolute border-2 border-black"></div>
+                <div
+                    class="l84 w-32 h-px left-[259px] top-[133px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l85 w-10 h-px left-[259px] top-[133px] absolute border-2 border-black"></div>
+                <div
+                    class="l86 w-6 h-px left-[297px] top-[157px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div
+                    class="l87 w-28 h-px left-[297px] top-[157px] absolute origin-top-left rotate-180 border-2 border-black">
+                </div>
+                <div
+                    class="l88 w-11 h-px left-[185px] top-[199px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div
+                    class="l89 w-20 h-px left-[185px] top-[199px] absolute origin-top-left rotate-180 border-2 border-black">
+                </div>
+                <div
+                    class="l810 w-5 h-px left-[104px] top-[215px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l811 w-48 h-px left-[104px] top-[215px] absolute border-2 border-black"></div>
+                <div
+                    class="l812 w-10 h-px left-[300px] top-[179px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l813 w-24 h-px left-[300px] top-[179px] absolute border-2 border-black"></div>
+                <div class="l21 w-24 h-px left-[1px] top-[60px] absolute border-2 border-black"></div>
+                <div
+                    class="l22 w-52 h-px left-[95px] top-[268px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l23 w-28 h-px left-[95px] top-[268px] absolute border-2 border-black"></div>
+                <div
+                    class="l24 w-24 h-px left-[210px] top-[176px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l25 w-20 h-px left-[210px] top-[176px] absolute border-2 border-black"></div>
+                <div
+                    class="l26 w-24 h-px left-[286px] top-[272px] absolute origin-top-left -rotate-90 border-2 border-black">
+                </div>
+                <div class="l27 w-16 h-px left-[286px] top-[272px] absolute border-2 border-black"></div>
+                <div
+                    class="l28 w-14 h-px left-[352px] top-[220px] absolute origin-top-left rotate-90 border-2 border-black">
+                </div>
+                <div class="l813 w-12 h-px left-[352px] top-[220px] absolute border-2 border-black"></div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                // Game state
+                let totalScore = parseInt(localStorage.getItem('totalScore')) || 0;
+
+                // Function to calculate and update progress
+                let score = 0;
+                let correctQuestion = 5;
+                const totalQuestions = 8;
+                let timeLeft = 120; // 2 minutes in seconds
+
+                // Get DOM elements
+                const timer = document.getElementById('timer');
+
+                // Correct answers for each question
+                const CORRECT_ANSWERS = {
+                    1: 'r5',
+                    2: 'r2',
+                    3: 'r1',
+                    4: 'r3',
+                    5: 'r4',
+                    6: 'r1',
+                    7: 'r2',
+                    8: 'r3',
+                };
+
+                // Get DOM elements
+                const scoreDisplay = document.querySelector('.c-score');
+                const scoreDisplay1 = document.querySelector('.current-score');
+                const popup = document.getElementById('timeoutPopup');
+                const closeBtn = document.querySelector('.close-btn');
+
+                const progressMap = {
+                    "q2.html": 20,
+                    "q3.html": 40,
+                    "q4.html": 60,
+                    "q5.html": 80,
+                    "q6.html": 100
+                };
+
+                // Get the current page name
+                const currentPage = window.location.pathname.split("/").pop();
+
+                // Set the progress bar width based on the current page
+                const progressBar = document.getElementById("progress-bar");
+                if (progressMap[currentPage]) {
+                    progressBar.style.width = progressMap[currentPage] + "%";
+                }
+                // Helper: Pad numbers for timer display
+                const pad = (num) => (num < 10 ? '0' : '') + num;
+                const startTimer = () => {
+                    const interval = setInterval(() => {
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            showTimeoutPopup();
+                        }
+                        else {
+                            timeLeft--;
+                            const minutes = Math.floor(timeLeft / 60);
+                            const seconds = timeLeft % 60;
+                            timer.textContent = `${pad(minutes)}:${pad(seconds)}`;
+                        }
+                    }, 1000);
+                };
+                startTimer();
+                // Show timeout popup
+                const showTimeoutPopup = () => {
+                    popup.style.display = 'block';
+                    scoreDisplay1.textContent = `Your score: ${score}`;
+
+                };
+                // Close popup
+                closeBtn?.addEventListener('click', () => {
+                    popup.style.display = 'none';
+                    window.location.href = 'result.html'; // Redirect to the next page      
+                })
+
+
+                // Check answer and update game state
+                const checkAnswer = (selectedBox, questionNumber) => {
+                    const selectedAnswer = Array.from(selectedBox.classList).find(cls => cls.startsWith('r'));
+                    const correctAnswer = CORRECT_ANSWERS[questionNumber];
+                    const isCorrect = selectedAnswer === correctAnswer;
+
+                    if (isCorrect) {
+                        score += 10;
+                        totalScore += 10;
+                    } 
+                    localStorage.setItem('totalScore', totalScore);
+                    updateScoreDisplay();
+                };
+
+                // Update the score display
+                const updateScoreDisplay = () => {
+                    scoreDisplay.textContent = `Score: ${score}`;
+                };
+
+                // Setup checkboxes for current question
+                document.querySelectorAll('[id^="q"]').forEach((questionDiv) => {
+                    const currentQuestion = parseInt(questionDiv.id.replace('q', ''));
+                    const checkboxes = questionDiv.querySelectorAll('div[class^="r"]');
+
+                    checkboxes.forEach((box) => {
+                        box.style.cursor = 'pointer';
+                        box.addEventListener('click', () => {
+                            const row = box.closest('.check');
+                            // Clear other selections in the same row
+                            row.querySelectorAll('div[class^="r"]').forEach((b) => {
+                                b.style.backgroundColor = '';
+                            });
+
+                            // Highlight selected box
+                            box.style.backgroundColor = '#4ade80';
+
+                            // Check answer
+                            checkAnswer(box, currentQuestion);
+                        });
+                    });
+                });
+                // Initialize
+                updateScoreDisplay();
+
+            });
+        </script>
+</body>
+
+</html>

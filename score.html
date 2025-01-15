@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-100 flex flex-col items-center">
+        <h1 class="text-4xl font-bold mt-8">Quiz Scores</h1>
+        <div id="scores-container" class="w-[90vw] max-w-3xl bg-white mt-8 p-6 rounded-2xl shadow-lg">
+            <table class="table-auto w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-teal-600 text-white">
+                        <th class="border border-gray-300 p-2">Name</th>
+                        <th class="border border-gray-300 p-2">Score</th>
+                        <th class="border border-gray-300 p-2">Date</th>
+                    </tr>
+                </thead>
+                <tbody id="score-list">
+                    <!-- Scores will be dynamically populated here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const scoreList = document.getElementById('score-list');
+            try {
+                const response = await fetch('http://localhost:5000/get-scores');
+                const scores = await response.json();
+
+                if (scores.length > 0) {
+                    scores.forEach(({ studentName, score, date }) => {
+                        const formattedDate = new Date(date).toLocaleString();
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td class="border border-gray-300 p-2 text-center">${studentName}</td>
+                            <td class="border border-gray-300 p-2 text-center">${score}</td>
+                            <td class="border border-gray-300 p-2 text-center">${formattedDate}</td>
+                        `;
+                        scoreList.appendChild(row);
+                    });
+                } else {
+                    const noDataRow = document.createElement('tr');
+                    noDataRow.innerHTML = `
+                        <td class="border border-gray-300 p-2 text-center" colspan="3">No scores available</td>
+                    `;
+                    scoreList.appendChild(noDataRow);
+                }
+            } catch (error) {
+                console.error('Error fetching scores:', error);
+                const errorRow = document.createElement('tr');
+                errorRow.innerHTML = `
+                    <td class="border border-gray-300 p-2 text-center" colspan="3">Error loading scores</td>
+                `;
+                scoreList.appendChild(errorRow);
+            }
+        });
+    </script>
+</body>
+</html>
